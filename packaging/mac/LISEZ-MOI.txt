@@ -1,0 +1,19 @@
+GENSHIN OVERLAY — installation
+==============================
+
+1. Glisse « Genshin Overlay » sur le dossier « Applications » (à côté).
+2. Ouvre Applications et double-clique sur Genshin Overlay.
+   Si macOS dit qu'il ne peut pas vérifier l'app : Réglages Système → Confidentialité et sécurité
+   → en bas, « Ouvrir quand même » (une seule fois).
+3. Première ouverture : une fenêtre Terminal installe Python et les bibliothèques (5 à 10 min,
+   Internet nécessaire). L'app démarre toute seule à la fin.
+4. Autorise « Genshin Overlay » dans Réglages Système → Confidentialité et sécurité :
+   « Enregistrement de l'écran » (obligatoire) et « Accessibilité » (pour certains raccourcis
+   et le mode « Passer les dialogues »), puis relance l'app.
+5. Dans le jeu, clique « Calibrer la mini-map » (panneau → Outils) et entoure ta mini-map.
+
+Les mises à jour arrivent toutes seules (bouton « Redémarrer » dans le panneau quand une
+nouvelle version est prête).
+
+Outil non officiel, non affilié à HoYoverse. Le mode « Passer les dialogues » appuie sur des
+touches à ta place : c'est contraire aux conditions d'utilisation du jeu, utilise-le à tes risques.

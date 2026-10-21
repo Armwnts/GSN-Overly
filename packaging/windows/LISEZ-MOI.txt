@@ -1,0 +1,22 @@
+GENSHIN OVERLAY — WINDOWS (version expérimentale)
+
+Installation
+1. Fais un clic droit sur le fichier .zip → « Extraire tout… », dans un dossier à toi
+   (par exemple Documents). Ne lance pas l'app depuis le .zip.
+2. Ouvre le dossier GenshinOverlay et double-clique sur GenshinOverlay.exe.
+   - Windows peut afficher « Windows a protégé votre ordinateur » : clique sur
+     « Informations complémentaires » puis « Exécuter quand même » (une seule fois).
+   - Accepte la demande d'autorisation (administrateur) : sans elle, l'app ne peut pas
+     appuyer sur les touches dans Genshin, qui tourne lui-même en administrateur.
+3. La première fois, une fenêtre installe Python et les bibliothèques (5 à 10 min).
+   Ne la ferme pas. L'overlay démarre ensuite tout seul.
+
+Dans le jeu : mode « Fenêtré » ou « Plein écran fenêtré » (pas le plein écran exclusif).
+Calibre ensuite la mini-map depuis le panneau de l'overlay.
+
+Tes données (progression, réglages, clé Gemini, cookies HoYoLAB) sont rangées dans
+%LOCALAPPDATA%\GenshinOverlay et ne quittent jamais ton PC.
+Les mises à jour s'installent automatiquement (Paramètres → Mises à jour).
+
+⚠ « Passer les dialogues » est une automatisation interdite par les conditions
+d'utilisation de HoYoverse : à utiliser à tes risques.

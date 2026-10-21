@@ -1,0 +1,67 @@
+#!/bin/bash
+# Genshin Overlay (macOS) — lanceur.
+# Code d'origine : dans l'app (Contents/Resources/app). Mises à jour, Python et données du joueur :
+# ~/Library/Application Support/GenshinOverlay
+RES="$(cd "$(dirname "$0")/../Resources" && pwd)"
+SUP="$HOME/Library/Application Support/GenshinOverlay"
+DATA="$SUP/data"
+BUNDLE_ID="fr.armand.genshinoverlay.app"
+mkdir -p "$DATA" "$SUP/code"
+export GIO_DATA_DIR="$DATA" GIO_SUP="$SUP" GIO_APP_RES="$RES/app" GIO_BUNDLE_ID="$BUNDLE_ID"
+export GIO_APP_ICON="$RES/AppIcon.icns" PYTHONDONTWRITEBYTECODE=1
+
+# Première ouverture : on récupère la progression et les réglages de la version Beta, s'il y en a une.
+BETA="$HOME/Library/Application Support/GenshinOverlayBeta"
+if [ ! -f "$SUP/.beta-migrated" ] && [ -f "$BETA/data/config.json" ]; then
+  cp -R "$BETA/data/." "$DATA/" 2>/dev/null && touch "$SUP/.beta-migrated"
+fi
+
+# vrai si la version $1 est strictement plus récente que $2
+newer() {
+  awk -v a="$1" -v b="$2" 'BEGIN { n=split(a,x,"."); m=split(b,y,"."); k=(n>m)?n:m;
+    for(i=1;i<=k;i++){ if((x[i]+0)>(y[i]+0)) exit 0; if((x[i]+0)<(y[i]+0)) exit 1 } exit 1 }'
+}
+
+# Code : la dernière mise à jour téléchargée, sauf si elle a planté au démarrage.
+CODE="$RES/app"
+BUNDLED="$(cat "$RES/app/VERSION" 2>/dev/null)"
+CUR="$(cat "$SUP/code/current" 2>/dev/null)"
+if [ -n "$CUR" ] && [ -f "$SUP/code/$CUR/run.py" ] && ! grep -qx "$CUR" "$SUP/code/bad" 2>/dev/null \
+   && newer "$CUR" "$BUNDLED"; then
+  MARK="$SUP/code/starting-$CUR"
+  N="$(cat "$MARK" 2>/dev/null || echo 0)"
+  if [ "$N" -ge 2 ]; then          # 2 démarrages ratés : on revient à la version d'origine
+    echo "$CUR" >> "$SUP/code/bad"; rm -f "$MARK"
+  else
+    echo $((N + 1)) > "$MARK"
+    CODE="$SUP/code/$CUR"
+  fi
+fi
+export GIO_CODE_DIR="$CODE"
+
+# Python et bibliothèques : installés une fois (fenêtre Terminal), réinstallés si la liste change.
+RT="$SUP/runtime"
+if [ ! -x "$RT/venv/bin/python" ] && [ -x "$BETA/runtime/venv/bin/python" ]; then
+  RT="$BETA/runtime"               # on réutilise le Python déjà installé par la Beta
+fi
+REQ_SUM="$(shasum -a 256 "$CODE/requirements.txt" | cut -c1-16)"
+if [ -x "$RT/venv/bin/python" ] && [ "$(cat "$RT/.ready" 2>/dev/null)" != "$REQ_SUM" ] && [ -x "$RT/bin/uv" ]; then
+  # Liste des bibliothèques changée : si tout est déjà là (hors ligne), pas besoin de réinstaller.
+  if UV_CACHE_DIR="$RT/cache" "$RT/bin/uv" pip install --offline --python "$RT/venv/bin/python" \
+       -r "$CODE/requirements.txt" >/dev/null 2>&1; then
+    echo "$REQ_SUM" > "$RT/.ready"
+  fi
+fi
+if [ ! -x "$RT/venv/bin/python" ] || [ "$(cat "$RT/.ready" 2>/dev/null)" != "$REQ_SUM" ] \
+   || [ ! -f "$DATA/maps/2/meta.json" ]; then
+  cat "$RES/app/setup.command" > "$SUP/setup.command"
+  chmod +x "$SUP/setup.command"
+  printf '%s' "$RES" > "$SUP/resources_path"
+  printf '%s' "$CODE" > "$SUP/code_path"
+  printf '%s' "$RT" > "$SUP/runtime_path"
+  open -a Terminal "$SUP/setup.command"
+  exit 0
+fi
+
+cd "$CODE"
+exec "$RT/venv/bin/python" "$CODE/run.py" >> "$DATA/overlay.log" 2>&1
